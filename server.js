@@ -6,12 +6,13 @@ require('dotenv').config();
 const app = express();
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => {
     console.error('MongoDB connection error:', err);
     process.exit(1); // Dừng server nếu không kết nối được
   });
+
 
 app.use(cors());
 app.use(express.json());
