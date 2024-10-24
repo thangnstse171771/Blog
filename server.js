@@ -29,7 +29,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.API_URL || 'http://localhost:5000', // URL của backend trên Render
+        url: process.env.API_URL || 'https://blog-backend-xy27.onrender.com', // URL của backend trên Render
       },
     ],
   },
