@@ -10,7 +10,10 @@ const app = express();
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Dừng server nếu không kết nối được
+  });
 
 app.use(cors());
 app.use(express.json());
@@ -74,17 +77,29 @@ const User = mongoose.model('User', userSchema);
  *               $ref: '#/components/schemas/User'
  *       400:
  *         description: Bad Request
+ *       409:
+ *         description: Email already exists
  *       500:
  *         description: Internal server error
  */
 app.post('/api/users', async (req, res) => {
   const { name, email, message } = req.body;
+
+  // Kiểm tra xem tất cả các trường cần thiết có được cung cấp không
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
+  }
+
   try {
     const newUser = new User({ name, email, message });
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (err) {
-    console.error(err);
+    // Nếu lỗi do trùng lặp email, trả về mã lỗi 409
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Email already exists' });
+    }
+    console.error('Error creating user:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -113,7 +128,7 @@ app.get('/api/users', async (req, res) => {
     const users = await User.find();
     res.json(users);
   } catch (err) {
-    console.error(err);
+    console.error('Error fetching users:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -125,6 +140,9 @@ app.get('/api/users', async (req, res) => {
  *   schemas:
  *     User:
  *       type: object
+ *       required:
+ *         - name
+ *         - email
  *       properties:
  *         name:
  *           type: string
