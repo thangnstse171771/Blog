@@ -38,8 +38,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // User Schema and Model
 const userSchema = new mongoose.Schema({
-  name: String,
-  email: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   message: String
 });
 
@@ -72,6 +72,8 @@ const User = mongoose.model('User', userSchema);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad Request
  *       500:
  *         description: Internal server error
  */
