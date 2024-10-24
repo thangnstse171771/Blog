@@ -1,0 +1,11 @@
+version: 1
+services:
+  - type: web
+    name: blog-app-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: MONGO_URI
+        value: mongodb+srv://thangdungdat:thanglata555@blog.f1awz.mongodb.net/blog_db?retryWrites=true&w=majority
