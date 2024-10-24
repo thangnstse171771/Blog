@@ -1,8 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
 require('dotenv').config();
 
 const app = express();
@@ -18,27 +16,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 app.use(cors());
 app.use(express.json());
 
-// Swagger configuration
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'User API',
-      version: '1.0.0',
-      description: 'API for managing users',
-    },
-    servers: [
-      {
-        url: process.env.API_URL || 'https://blog-backend-xy27.onrender.com', // URL của backend trên Render
-      },
-    ],
-  },
-  apis: ['./server.js'], // Tên file chứa các chú thích Swagger
-};
-
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
 // User Schema and Model
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -49,42 +26,6 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 // Route to handle user info submission
-/**
- * @swagger
- * /api/users:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *                 example: John Doe
- *               email:
- *                 type: string
- *                 example: johndoe@example.com
- *               message:
- *                 type: string
- *                 example: Hello!
- *     responses:
- *       201:
- *         description: User created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       400:
- *         description: Bad Request
- *       409:
- *         description: Email already exists
- *       500:
- *         description: Internal server error
- */
 app.post('/api/users', async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -107,24 +48,6 @@ app.post('/api/users', async (req, res) => {
 });
 
 // Route to fetch all users
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Retrieve a list of users
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: A list of users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- *       500:
- *         description: Internal server error
- */
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find();
@@ -134,28 +57,6 @@ app.get('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-// User Schema for Swagger
-/**
- * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - name
- *         - email
- *       properties:
- *         name:
- *           type: string
- *           example: John Doe
- *         email:
- *           type: string
- *           example: johndoe@example.com
- *         message:
- *           type: string
- *           example: Hello!
- */
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
