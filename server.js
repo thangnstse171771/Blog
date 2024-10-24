@@ -64,10 +64,13 @@ const User = mongoose.model('User', userSchema);
  *             properties:
  *               name:
  *                 type: string
+ *                 example: John Doe
  *               email:
  *                 type: string
+ *                 example: johndoe@example.com
  *               message:
  *                 type: string
+ *                 example: Hello!
  *     responses:
  *       201:
  *         description: User created successfully
@@ -95,7 +98,6 @@ app.post('/api/users', async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (err) {
-    // Nếu lỗi do trùng lặp email, trả về mã lỗi 409
     if (err.code === 11000) {
       return res.status(409).json({ error: 'Email already exists' });
     }
@@ -146,10 +148,13 @@ app.get('/api/users', async (req, res) => {
  *       properties:
  *         name:
  *           type: string
+ *           example: John Doe
  *         email:
  *           type: string
+ *           example: johndoe@example.com
  *         message:
  *           type: string
+ *           example: Hello!
  */
 
 const PORT = process.env.PORT || 5000;
